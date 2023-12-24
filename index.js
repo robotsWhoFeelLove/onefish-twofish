@@ -42,26 +42,75 @@ function expandNested(arr, field, newField) {
   return tempResult;
 }
 
-function filterDataSet(dataArr, filterArr) {
+function filterData(dataArr, filterArr) {
   let tempResult = [...dataArr];
+  let tempDatum;
   filterArr.map((filter) => {
-    let tempDatum = tempResult.filter((item) => {
-      if (filter.operator == "==") return item[filter.field] == filter.value;
-      if (filter.operator == ">=") return item[filter.field] >= filter.value;
-      if (filter.operator == "<=") return item[filter.field] <= filter.value;
-      if (filter.operator == "===") return item[filter.field] === filter.value;
-      if (filter.operator == ">") return item[filter.field] > filter.value;
-      if (filter.operator == "<") return item[filter.field] < filter.value;
-      if (filter.operator == "includes")
-        return item[filter.field].includes(filter.value);
-    });
+    if (
+      Array.isArray(filter.field) &&
+      filter.operator == "or" &&
+      Array.isArray(filter.value)
+    ) {
+      let filterSet = filter.field.map((el, index) => {
+        return {
+          field: el,
+          operator: "==",
+          value: filter.value[index],
+        };
+      });
 
+      tempDatum = tempResult.filter((item) => {
+        if (filterSet.length == 2) {
+          return (
+            item[filterSet[0].field] == filterSet[0].value ||
+            item[filterSet[1].field] == filterSet[1].value
+          );
+        }
+      });
+    } else {
+      tempDatum = tempResult.filter((item) => {
+        if (filter.operator == "==") return item[filter.field] == filter.value;
+        if (filter.operator == ">=") return item[filter.field] >= filter.value;
+        if (filter.operator == "<=") return item[filter.field] <= filter.value;
+        if (filter.operator == "===")
+          return item[filter.field] === filter.value;
+        if (filter.operator == ">") return item[filter.field] > filter.value;
+        if (filter.operator == "<") return item[filter.field] < filter.value;
+        if (filter.operator == "includes") {
+          return item[filter.field].includes(filter.value);
+        }
+        if (filter.operator == "!includes") {
+          return !item[filter.field].includes(filter.value);
+        }
+        if (filter.operator == "!=") return item[filter.field] != filter.value;
+        if (filter.operator == "!==")
+          return item[filter.field] !== filter.value;
+      });
+    }
     tempResult = [...tempDatum];
-
-    // console.log({ tempResult });
   });
-  console.log({ tempResult });
   return tempResult;
 }
 
-module.exports = { splitOut, expandNested, filterDataSet };
+function flattenObject(object) {
+  let result = {};
+
+  const recursiveFunction = (obj, lastObj) => {
+    for (const key in obj) {
+      if (typeof obj[key] === "object" && Array.isArray(obj[key]) === false) {
+        recursiveFunction(
+          obj[key],
+          lastObj != undefined ? [lastObj + "_" + key] : [key]
+        );
+      } else {
+        if (lastObj != undefined)
+          result = { ...result, [lastObj + "_" + key]: obj[key] };
+        if (lastObj == undefined) result = { ...result, [key]: obj[key] };
+      }
+    }
+  };
+  recursiveFunction(object);
+  return result;
+}
+
+module.exports = { splitOut, expandNested, filterData, flattenObject };
