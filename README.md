@@ -22,7 +22,7 @@ npm install onefish-twofish
 ## Filtering:
 
 - [**filterData**](#filterData) : Complex filtering function.
-- [**Filter Objects:**](#Filter-Objects:) : Objects that can be added to your chain of filters.
+- [**Filter Objects:**](#filter-objects) : Objects that can be added to your chain of filters.
 - [**Or Filtering**](#Or-Filtering) : Use or logic within your filers.
 - [**Or as an Operation**](#Or-as-an-Operation) : Or as a simple operation.
 
@@ -383,7 +383,7 @@ let filteredArr = filterData(arr,filterObj)
 
 ### Or Filtering
 
-As the name implies, Or filtering functions with or logic. You can use any operator by adding the key isOr:true
+As the name implies, Or filtering functions with "or" logic. You can use any operator by adding the key isOr:true
 
 **Or Ex:**
 
@@ -395,7 +395,7 @@ let arr = [{field: "oneFish",someValue:4,someArray:["blackFish","oldFish","newFi
           {field: "twoFish",someValue:4,someArray:["blackFish","newFish"]}]
 ```
 
-**Function:**
+**Function:** Here we add isOr:true to our filter object to filter items where either field === "oneFish" **OR** someArray.includes("oldFish")
 
 ```
 let filters =  [
@@ -429,24 +429,29 @@ let orArr = [
                 {fieldOne:"otherValue",fieldTwo:"otherValue",fieldThree:"valueThree"},
                 {fieldOne:"otherValue",fieldTwo:"otherValue",fieldThree:"otherValue"}
             ]
-**Function:**
+**Function:** Here we add two arrays, so we return items where fieldOne = "valueOne" **OR** fieldTwo = "valueTwo" **OR** fieldThree = "valueThree"
+```
+
 const orFilterOperation = {
-                            field:["fieldOne", "fieldTwo", "fieldThree"],
-                            operation: "or",
-                            value: ["valueOne", "valueTwo", "valueThree"]
-                          }
+field:["fieldOne", "fieldTwo", "fieldThree"],
+operation: "or",
+value: ["valueOne", "valueTwo", "valueThree"]
+}
 
 let orDataFiltered = filterData(orArr,[orFilterOperation])
+
 ```
 
 **Result:**
 
 ```
+
 [
-    {fieldOne:"valueOne",fieldTwo:"valueTwo",fieldThree:"valueThree"},
-    {fieldOne:"otherValue",fieldTwo:"valueTwo",fieldThree:"otherValue"},
-    {fieldOne:"otherValue",fieldTwo:"otherValue",fieldThree:"valueThree"},
+{fieldOne:"valueOne",fieldTwo:"valueTwo",fieldThree:"valueThree"},
+{fieldOne:"otherValue",fieldTwo:"valueTwo",fieldThree:"otherValue"},
+{fieldOne:"otherValue",fieldTwo:"otherValue",fieldThree:"valueThree"},
 ]
+
 ```
 
 ## aggregateThings
@@ -464,40 +469,45 @@ Takes 4 arguments:
 > [!NOTE]
 > By default, strict is it set to false. Useful for things like, separating falsy values, if you wanted to keep empty strings("") and NULL values on separate lines. By default, empty strings and NULLs will be combined.
 
-> [!NOTE]
-> Aggregate Objects consist of two fields
->
-> - **field:** The field to apply the aggregation to as a string.
-> - **opertation:** The aggregation function to apply as a string. (You can pass custom functions to the operation if so desired)
->
-> Let's start out with a basic example.
+**Aggregate Objects consist of two fields**
+
+- **field:** The field to apply the aggregation to as a string.
+- **opertation:** The aggregation function to apply as a string. (You can pass custom functions to the operation if so desired)
+
+Let's start out with a basic example.
 
 **Source Data:**
 
 ```
+
 let sourceData = [
-                    {region: "NA",score:30},
-                    {region: "NA",score:20},
-                    {region: "EMEA", score: 10},
-                    {region: "EMEA", score:20}
-                ]
-```
-
-**Function:**
+{region: "NA",score:30},
+{region: "NA",score:20},
+{region: "EMEA", score: 10},
+{region: "EMEA", score:20}
+]
 
 ```
+
+**Function:** Here we want to return the average of score across each region.
+
+```
+
 let aggObj = {field:"score",operation:"average"}
 
 let aggregatedData = aggregateThings(sourceData,["region"],aggObj)
+
 ```
 
 **Result:**
 
 ```
+
 [
 {region:NA, score:25,count:2},
 {region:EMEA, score:15, count:2}
 ]
+
 ```
 
 > [!NOTE]
@@ -522,63 +532,69 @@ Let's see a more compound example:
 **Source Data:**
 
 ```
+
 let dataArr = [
-  { currentSubscribers: 8, newSubscribers: 5, region: "NA", company: "Max" },
-  { currentSubscribers: 5, newSubscribers: 4, region: "NA", company: "Netflix" },
-  { currentSubscribers: 20, newSubscribers: 5, region: "NA", company: "Amazon" },
-  { currentSubscribers: 17, newSubscribers: 1, region: "APAC", company: "Max" },
-  { currentSubscribers: 15, newSubscribers: 6, region: "APAC", company: "Netflix" },
-  { currentSubscribers: 6, newSubscribers: 2, region: "APAC", company: "Amazon" },
-  { currentSubscribers: 9, newSubscribers: 2, region: "EMEA", company: "Max" },
-  { currentSubscribers: 8, newSubscribers: 4, region: "EMEA", company: "Netflix" },
-  { currentSubscribers: 8, newSubscribers: 4, region: "EMEA", company: "Amazon" },
+{ currentSubscribers: 8, newSubscribers: 5, region: "NA", company: "Max" },
+{ currentSubscribers: 5, newSubscribers: 4, region: "NA", company: "Netflix" },
+{ currentSubscribers: 20, newSubscribers: 5, region: "NA", company: "Amazon" },
+{ currentSubscribers: 17, newSubscribers: 1, region: "APAC", company: "Max" },
+{ currentSubscribers: 15, newSubscribers: 6, region: "APAC", company: "Netflix" },
+{ currentSubscribers: 6, newSubscribers: 2, region: "APAC", company: "Amazon" },
+{ currentSubscribers: 9, newSubscribers: 2, region: "EMEA", company: "Max" },
+{ currentSubscribers: 8, newSubscribers: 4, region: "EMEA", company: "Netflix" },
+{ currentSubscribers: 8, newSubscribers: 4, region: "EMEA", company: "Amazon" },
 ];
-```
-
-**Function:**
 
 ```
+
+**Function:** Here we return a number of aggregations accross each company:
+
+```
+
 let test1 = aggregateThings(dataArr, ["company"], [
-  { field: "currentSubscribers", operation: "min" },
-  { field: "currentSubscribers", operation: "average" },
-  { field: "newSubscribers", operation: "max" },
-  { field: "newSubscribers", operation: "%>3" },
-  { field: "newSubscribers", operation: "sum" },
+{ field: "currentSubscribers", operation: "min" },
+{ field: "currentSubscribers", operation: "average" },
+{ field: "newSubscribers", operation: "max" },
+{ field: "newSubscribers", operation: "%>3" },
+{ field: "newSubscribers", operation: "sum" },
 ]);
+
 ```
 
 **Result:**
 
 ```
+
 [
-    {
-        "company": "Max",
-        "min_of_currentSubscribers": 8,
-        "average_of_currentSubscribers": 11.333333333333334,
-        "max_of_newSubscribers": 5,
-        "%_newSubscribers_greater_than_3": 33.33333333333333,
-        "sum_of_newSubscribers": 8,
-        "count": 3
-    },
-    {
-        "company": "Netflix",
-        "min_of_currentSubscribers": 5,
-        "average_of_currentSubscribers": 9.333333333333334,
-        "max_of_newSubscribers": 6,
-        "%_newSubscribers_greater_than_3": 100,
-        "sum_of_newSubscribers": 14,
-        "count": 3
-    },
-    {
-        "company": "Amazon",
-        "min_of_currentSubscribers": 6,
-        "average_of_currentSubscribers": 11.333333333333334,
-        "max_of_newSubscribers": 5,
-        "%_newSubscribers_greater_than_3": 66.66666666666666,
-        "sum_of_newSubscribers": 11,
-        "count": 3
-    }
+{
+"company": "Max",
+"min_of_currentSubscribers": 8,
+"average_of_currentSubscribers": 11.333333333333334,
+"max_of_newSubscribers": 5,
+"%_newSubscribers_greater_than_3": 33.33333333333333,
+"sum_of_newSubscribers": 8,
+"count": 3
+},
+{
+"company": "Netflix",
+"min_of_currentSubscribers": 5,
+"average_of_currentSubscribers": 9.333333333333334,
+"max_of_newSubscribers": 6,
+"%_newSubscribers_greater_than_3": 100,
+"sum_of_newSubscribers": 14,
+"count": 3
+},
+{
+"company": "Amazon",
+"min_of_currentSubscribers": 6,
+"average_of_currentSubscribers": 11.333333333333334,
+"max_of_newSubscribers": 5,
+"%_newSubscribers_greater_than_3": 66.66666666666666,
+"sum_of_newSubscribers": 11,
+"count": 3
+}
 ]
+
 ```
 
 ### Passing in Custom Functions
@@ -588,60 +604,70 @@ You can pass your own functions into the aggregation object. When the aggregator
 - **arr** The array of aggregated items for the function to be performed on.
 - **aggObject** The aggregation object itself.
 
-> [!NOTE]
+> [!IMPORTANT]
 > Your function must return an object with the key value pair you are adding.
 > Take the below example.
 
 **Source Data:**
 
 ```
+
 let dataArr = [
-  { currentSubscribers: 8, newSubscribers: 5, topGenres: ["comedy", "action", "drama"], region: "NA", company: "Max" },
-  { currentSubscribers: 5, newSubscribers: 4, topGenres: ["drama"], region: "NA", company: "Netflix" },
-  { currentSubscribers: 20, newSubscribers: 5, topGenres: ["comedy"], region: "NA", company: "Amazon" },
-  { currentSubscribers: 17, newSubscribers: 1, topGenres: ["action"], region: "APAC", company: "Max" },
-  { currentSubscribers: 15, newSubscribers: 6, topGenres: ["drama"], region: "APAC", company: "Netflix" },
-  { currentSubscribers: 6, newSubscribers: 2, topGenres: ["comedy", "action", "drama"], region: "APAC", company: "Amazon" },
-  { currentSubscribers: 9, newSubscribers: 2, topGenres: ["comedy"], region: "EMEA", company: "Max" },
-  { currentSubscribers: 8, newSubscribers: 4, topGenres: ["action"], region: "EMEA", company: "Netflix" },
-  { currentSubscribers: 8, newSubscribers: 4, topGenres: ["drama"], region: "EMEA", company: "Amazon" },
+{ currentSubscribers: 8, newSubscribers: 5, topGenres: ["comedy", "action", "drama"], region: "NA", company: "Max" },
+{ currentSubscribers: 5, newSubscribers: 4, topGenres: ["drama"], region: "NA", company: "Netflix" },
+{ currentSubscribers: 20, newSubscribers: 5, topGenres: ["comedy"], region: "NA", company: "Amazon" },
+{ currentSubscribers: 17, newSubscribers: 1, topGenres: ["action"], region: "APAC", company: "Max" },
+{ currentSubscribers: 15, newSubscribers: 6, topGenres: ["drama"], region: "APAC", company: "Netflix" },
+{ currentSubscribers: 6, newSubscribers: 2, topGenres: ["comedy", "action", "drama"], region: "APAC", company: "Amazon" },
+{ currentSubscribers: 9, newSubscribers: 2, topGenres: ["comedy"], region: "EMEA", company: "Max" },
+{ currentSubscribers: 8, newSubscribers: 4, topGenres: ["action"], region: "EMEA", company: "Netflix" },
+{ currentSubscribers: 8, newSubscribers: 4, topGenres: ["drama"], region: "EMEA", company: "Amazon" },
 ];
-```
-
-**Custom Function:**
 
 ```
+
+**Custom Function:** Here we write a function ro return a count of values where top genre includes comedy.
+
+```
+
 function countComedy(arr, aggObj) {
-  const countOfComedy = arr.filter((item) => item[aggObj.field].includes("comedy")).length;
-  const val = { "#_Top_Genre_Comedy": countOfComedy };
-  return val;
+const countOfComedy = arr.filter((item) => item[aggObj.field].includes("comedy")).length;
+const val = { "#\_Top_Genre_Comedy": countOfComedy };
+return val;
 }
+
 ```
 
 **Function**
 
 ```
+
 let test1 = aggregateThings(dataArr, ["company"], [{ field: "topGenres", operation: countComedy }]);
+
 ```
 
 **Result**
 
 ```
+
 [
-    {
-        "company": "Max",
-        "#_Top_Genre_Comedy": 2,
-        "count": 3
-    },
-    {
-        "company": "Netflix",
-        "#_Top_Genre_Comedy": 0,
-        "count": 3
-    },
-    {
-        "company": "Amazon",
-        "#_Top_Genre_Comedy": 2,
-        "count": 3
-    }
+{
+"company": "Max",
+"#_Top_Genre_Comedy": 2,
+"count": 3
+},
+{
+"company": "Netflix",
+"#_Top_Genre_Comedy": 0,
+"count": 3
+},
+{
+"company": "Amazon",
+"#_Top_Genre_Comedy": 2,
+"count": 3
+}
 ]
+
+```
+
 ```
