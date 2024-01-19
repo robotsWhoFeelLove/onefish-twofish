@@ -1,21 +1,28 @@
 # <span style="color: #e0474c" >One Fish </span><span style="color: #7ab8d6">Two Fish</span>
 
-Group of functions for common operations needed with arrays of objects for data manipulation, visualization prep, etc.
+A group of functions for common operations needed with arrays of objects for data manipulation, visualization prep, etc.
+
+## Usage
+
+```
+npm install onefish-twofish
+```
 
 ## Simple Functions:
 
-- [**splitOut**](#splitOut)
+- [**cloneThing**](#cloneThing)
 - [**expandNested**](#expandNested)
+- [**flattenObject**](#flattenObject)
 - [**getUniqueVals**](#getUniqueVals)
 - [**roundToDecimal**](#roundToDecimal)
-- [**cloneThing**](#cloneThing)
-- [**flattenObject**](#flattenObject)
+- [**splitOut**](#splitOut)
 
-## filterData:
+## Filtering:
 
-- [**filterData**](#filterThing)
-- [**Filter Objects**](#Filter_Objects)
-  //todo
+- [**filterData**](#filterData)
+- [**Filter Objects:**](#Filter-Objects:)
+- [**Or Filtering**](#Or-Filtering)
+- [**Or as an Operation**](#Or-as-an-Operation)
 
 ## Aggregate Functions:
 
@@ -41,9 +48,9 @@ Takes 4 isArguments:
 {column_1:["one fish","blue fish"]}
 ]
 
-const result1 = splitOut(data,["red fish","blue fish"],"column_1")
+const result2 = splitOut(data,["red fish","blue fish"],"column_1")
 
-<!-- result1: [
+<!-- result2: [
 {column_1:["one fish","two fish"],column_1_copy:["red fish","blue fish"]},
 {column_1:["one fish"],column_1_copy:["blue fish"]}
 ] -->
@@ -190,7 +197,7 @@ let clonedThing = cloneThing(thing)
 **filterData(arr, filterArr)** :
 Filters the data utilizing a filter array. The filter array is an array of filter objects.
 
-Takes 2 argument:
+Takes 2 arguments:
 
 - **arr:** The array to be filtered.
 - **filterArr:** The array of filter objects.
@@ -253,62 +260,102 @@ let filteredArr = filterData(arr,filterArr)
 
 ### Filter Objects:
 
-- {field:"someField", operation: "===", value: "someValue"}
-- {field:"someField", operation: "==", value: "someValue"}
-- {field:"someField", operation: "!==", value: "someValue"}
-- {field:"someField", operation: "!=", value: "someValue"}
-- {field:"someField", operation: ">=", value: "someValue"}
-- {field:"someField", operation: ">", value: "someValue"}
-- {field:"someField", operation: "<=", value: "someValue"}
-- {field:"someField", operation: "<", value: "someValue"}
-- {field:"someField", operation: "includes", value: "someValue"}
-- {field:"someField", operation: "!includes", value: "someValue"}
+| Operation   | Usage                                       |
+| ----------- | ------------------------------------------- |
+| "==="       | strict equivalence                          |
+| "=="        | shallow equivalence                         |
+| "!=="       | strict inequivalence                        |
+| "!="        | shallow inequivalence                       |
+| ">="        | greater than or equal to                    |
+| ">"         | greater than                                |
+| "<="        | less than or equal to                       |
+| "<"         | less than                                   |
+| "includes"  | whether an array includes the value         |
+| "!includes" | whether an array does not include the value |
+| "or"        | [See below for usage ](#or-as-an-operation) |
 
 **Filtering by numeric values**
+You can filter by numeric operations like greater than, less than etc.
+
+**Source Data**
 
 ```
 let arr = [{field: "oneFish",someValue:4,someArray:["blackFish","oldFish","newFish"]},
           {field: "twoFish",someValue:2,someArray:["blackFish","oldFish","newFish"]}
           {field: "oneFish",someValue:4,someArray:["blackFish","newFish"]}]
+```
 
+**Function**
+
+```
 let filterObj =  { field: "someValue", operation: ">", value: 3 }
+
 let filteredArr = filterData(arr,[filterObj])
+```
 
- <!-- result:[{field: "oneFish", someValue:4, someArray:["blackFish","oldFish","newFish"]},
-              {field: "oneFish", someValue:4, someArray:["blackFish","newFish"]}] -->
+**Result:**
 
+```
+ [
+    {field: "oneFish", someValue:4, someArray:["blackFish","oldFish","newFish"]},
+    {field: "oneFish", someValue:4, someArray:["blackFish","newFish"]}
+]
 ```
 
 **Filtering nested arrays**
+You can filter by objects included or not included in arrays.
+
+**Source Data:**
 
 ```
 let arr = [{field: "oneFish",someValue:4,someArray:["blackFish","oldFish","newFish"]},
           {field: "twoFish",someValue:2,someArray:["blackFish","oldFish","newFish"]}
           {field: "oneFish",someValue:4,someArray:["blackFish","newFish"]}]
+```
 
+**Function:**
+
+```
 let filterObj =  { field: "someArray", operation: "includes", value: "oldFish" }
-let filteredArr = filterData(arr,[filterObj])
 
-<!-- result: [{field: "oneFish",someValue:4,someArray:["blackFish","oldFish","newFish"]},
-              {field: "twoFish",someValue:2,someArray:["blackFish","oldFish","newFish"]}
-             ] -->
+let filteredArr = filterData(arr,[filterObj])
+```
+
+**Result:**
+
+```
+ [
+    {field: "oneFish",someValue:4,someArray:["blackFish","oldFish","newFish"]},
+    {field: "twoFish",someValue:2,someArray:["blackFish","oldFish","newFish"]}
+]
 ```
 
 **Combining filters**
+Filters can be combined for complex filtering.
+
+**Source Data:**
 
 ```
-
 let arr = [{field: "oneFish",someValue:4,someArray:["blackFish","oldFish","newFish"]},
           {field: "twoFish",someValue:2,someArray:["blackFish","oldFish","newFish"]}
           {field: "oneFish",someValue:4,someArray:["blackFish","newFish"]}]
+```
 
+**Function:**
+
+```
 let filters =  [{ field: "someArray", operation: "includes", value: "oldFish" },
                 { field: "someValue", operation: ">", value: 3 }
                 ]
 let filteredArr = filterData(arr,filterObj)
+```
 
-<!-- result: [{field: "oneFish",someValue:4,someArray:["blackFish","oldFish","newFish"]}
-             ] -->
+**Result:**
+
+```
+[
+    {field: "oneFish",someValue:4,someArray:["blackFish","oldFish","newFish"]}
+]
 ```
 
 ### Or Filtering
@@ -317,18 +364,32 @@ As the name implies, Or filtering functions with or logic. You can use any opera
 
 **Or Ex:**
 
+**Source Data:**
+
 ```
 let arr = [{field: "oneFish",someValue:4,someArray:["blackFish","oldFish","newFish"]},
           {field: "twoFish",someValue:2,someArray:["blackFish","oldFish","newFish"]}
           {field: "twoFish",someValue:4,someArray:["blackFish","newFish"]}]
+```
 
-let filters =  [{isOr:true, field: "field", operation: "===", value: "oneFish" },
+**Function:**
+
+```
+let filters =  [
+                {isOr:true, field: "field", operation: "===", value: "oneFish" },
                 {isOr:true, field: "someArray", operation: "includes", value: "oldFish }
                 ]
-let filteredArr = filterData(arr,filterObj)
 
-<!-- filteredArr: [{field: "oneFish",someValue:4,someArray:["blackFish","oldFish","newFish"]},
-          {field: "twoFish",someValue:2,someArray:["blackFish","oldFish","newFish"]}] -->
+let filteredArr = filterData(arr,filterObj)
+```
+
+**Result:**
+
+```
+[
+    {field: "oneFish",someValue:4,someArray:["blackFish","oldFish","newFish"]},
+    {field: "twoFish",someValue:2,someArray:["blackFish","oldFish","newFish"]}
+]
 
 ```
 
@@ -338,23 +399,82 @@ Or can be used as an operation for shallow equivalence of multiple fields. In th
 
 **Ex:**
 
-```
-const orFilterOperation = {field:["fieldOne","fieldTwo","fieldThree"],
-                     operation:"or",
-                     value: ["valueOne","valueTwo","valueThree"]}
+**Source Data:**
 
+```
 let orArr = [
                 {fieldOne:"valueOne",fieldTwo:"valueTwo",fieldThree:"valueThree"},
                 {fieldOne:"otherValue",fieldTwo:"valueTwo",fieldThree:"otherValue"},
                 {fieldOne:"otherValue",fieldTwo:"otherValue",fieldThree:"valueThree"},
                 {fieldOne:"otherValue",fieldTwo:"otherValue",fieldThree:"otherValue"}
             ]
+**Function:**
+const orFilterOperation = {
+                            field:["fieldOne", "fieldTwo", "fieldThree"],
+                            operation: "or",
+                            value: ["valueOne", "valueTwo", "valueThree"]
+                          }
 
 let orDataFiltered = filterData(orArr,[orFilterOperation])
+```
 
-<!-- orDataFiltered: [
-                {fieldOne:"valueOne",fieldTwo:"valueTwo",fieldThree:"valueThree"},
-                {fieldOne:"otherValue",fieldTwo:"valueTwo",fieldThree:"otherValue"},
-                {fieldOne:"otherValue",fieldTwo:"otherValue",fieldThree:"valueThree"},
-                ] -->
+**Result:**
+
+```
+[
+    {fieldOne:"valueOne",fieldTwo:"valueTwo",fieldThree:"valueThree"},
+    {fieldOne:"otherValue",fieldTwo:"valueTwo",fieldThree:"otherValue"},
+    {fieldOne:"otherValue",fieldTwo:"otherValue",fieldThree:"valueThree"},
+]
+```
+
+## aggregateThings
+
+**aggregateThings(arr, groupArr, aggObjArr,isStrict)** :
+Aggregates the data by a group of fields and returns specified operations.
+
+Takes 4 arguments:
+
+- **arr:** The array to be aggregated.
+- **groupArr:** The array of fields to group by as strings.
+- **aggObjArr:** An array of aggregation objects.
+- **isStrict:** _Optional_ Whether to perform strict equivalence.
+
+> [!NOTE]
+> By default, strict is it set to false. Useful for things like, separating falsy values, if you wanted to keep empty strings("") and NULL values on separate lines. By default, empty strings and NULLs will be combined.
+
+> [!NOTE]
+> Aggregate Objects consist of two fields
+>
+> - **field:** The field to apply the aggregation to as a string.
+> - **opertation:** The aggregation function to apply as a string. (You can pass custom functions to the operation if so desired)
+>
+> Let's start out with a basic example.
+
+**Source Data:**
+
+```
+let sourceData = [
+                    {region: "NA",score:30},
+                    {region: "NA",score:20},
+                    {region: "EMEA", score: 10},
+                    {region: "EMEA", score:20}
+                ]
+```
+
+**Function:**
+
+```
+let aggObj = {field:"score",operation:"average"}
+
+let aggregatedData = aggregateThings(sourceData,["region"],aggObj)
+```
+
+**Result:**
+
+```
+[
+{region:NA, score:25},
+{region:EMEA, score:15}
+]
 ```

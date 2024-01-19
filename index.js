@@ -148,7 +148,7 @@ function groupThing(arr, groupArr, strict = false) {
   return resultArr;
 }
 
-function aggregateThing(arr, groupArr, aggObj = [{ operation: "count" }], strict = false) {
+function aggregateThings(arr, groupArr, aggObj = [{ operation: "count" }], strict = false) {
   if (Array.isArray(aggObj) && !aggObj.includes({ operation: "count" })) {
     aggObj.push({ operation: "count" });
   } else {
