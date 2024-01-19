@@ -1,4 +1,4 @@
-# One Fish Two Fish
+# <span style="color: #e0474c" >One Fish </span><span style="color: #7ab8d6">Two Fish</span>
 
 Group of functions for common operations needed with arrays of objects for data manipulation, visualization prep, etc.
 
@@ -10,6 +10,7 @@ Group of functions for common operations needed with arrays of objects for data 
 Returns a new array of objects that splits out selected nested values into a new field.
 Does not modify the original Array field.
 Takes 4 isArguments:
+
 -1: arr | The Original Array
 -2: filterArr | An Array of values to be filtered out.
 -3: field | The name of the field within the object.
@@ -25,10 +26,10 @@ Takes 4 isArguments:
 
 const result1 = splitOut(data,["red fish","blue fish"],"column_1")
 
-result1: [
+<!-- result1: [
 {column_1:["one fish","two fish"],column_1_copy:["red fish","blue fish"]},
 {column_1:["one fish"],column_1_copy:["blue fish"]}
-]
+] -->
 
 const result1 = splitOut(data,["red fish","blue fish"],"column_1",column_2)
 
@@ -44,6 +45,7 @@ const result1 = splitOut(data,["red fish","blue fish"],"column_1",column_2)
 
 Expands an array of objects by values within a nested Array.
 Takes 3 arguments
+
 -1: arr | The Original Array of objects.
 -2: field | The Name of the field containing the Array
 -3: newField | Optional- The name of the new field the values should be expanded to.
@@ -74,6 +76,7 @@ const result2 = expandNested (arr,"val3")
 **getUniqueVals(arr, field)** :
 Returns an array of all the unique values a field contains
 Takes 2 arguments:
+
 -1: arr | The array of objects
 -2: field | The field name as a string.
 
@@ -93,7 +96,7 @@ result: ["one fish","two fish"]
 
 ## roundToDecimal
 
-**roundToDecimal(num, decimalPlace) ** :
+**roundToDecimal(num, decimalPlace)** :
 Rounds to the specified decimal place
 Takes 2 arguments:
 -1: num | The number
@@ -111,7 +114,7 @@ result3 = roundToDecimal(num, 2) // 3.333
 
 ## cloneThing
 
-**cloneThing(thing) ** :
+**cloneThing(thing)** :
 Returns a deep clone of an object.
 Takes 1 arguments:
 -1: thing | The thing to clone
