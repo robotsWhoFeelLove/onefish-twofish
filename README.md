@@ -520,7 +520,7 @@ let sourceData = [
 
 ```
 
-let aggObj = {field:"score",operation:"average"}
+let aggObj = [{field:"score",operation:"average"}]
 
 let aggregatedData = aggregateThings(sourceData,["region"],aggObj)
 
