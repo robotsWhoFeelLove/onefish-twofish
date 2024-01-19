@@ -2,7 +2,7 @@
 
 ![](images/fishTwo.svg)
 
-A group of functions for common operations needed with arrays of objects for data manipulation, visualization prep, etc.
+A group of functions for common operations to perform on data comprised of arrays of objects. Can be used for data analysis, data visualization prep, etc.
 
 ## Usage
 
@@ -52,14 +52,16 @@ let clonedThing = cloneThing(thing)
 thing.key.obj= "new value"
 ```
 
-**Result**
+**Result:** Here we see the cloned object is unaffected by mutating the original object.
 
 ```
     thing: {key:{obj:"new value"}}
     clonedThing: {key:{obj:"value}}
 ```
 
-### expandNested
+---
+
+## expandNested
 
 **expandNested(arr, field,newField)**:
 
@@ -84,7 +86,7 @@ const result1 = expandNested (arr,"val3","val4")
 const result2 = expandNested (arr,"val3")
 ```
 
-Results:
+**Results:** Here we expand val three, returning a new line/object for each item in val3.
 
 ```
     result1: [
@@ -98,6 +100,8 @@ Results:
     ]
 ```
 
+---
+
 ## flattenObject
 
 **flattenObject(object)** :
@@ -110,22 +114,24 @@ Takes 1 argument:
 **Ex:**
 
 ```
-let thing = {someKey:{someNestedKey:{oneFish:"twoFish",redFish:"bluefish"}}}
+let obj = {someKey:{someNestedKey:{oneFish:"twoFish",redFish:"bluefish"}}}
 
-let clonedThing = cloneThing(thing)
+let flatObj = flattenObject(obj)
 ```
 
-**Result**
+**Result:** Here we return the object flattened so we can perform more operations on the data.
 
 ```
 result:
-  clonedThing: {
+  flatObj: {
     "someKey_someNestedKey_oneFish": "twoFish",
     "someKey_someNestedKey_redFish": "bluefish"
 }
 
 
 ```
+
+---
 
 ## getUniqueVals
 
@@ -151,6 +157,8 @@ result = getUniqueVals(data,"column_1")
 result: ["one fish","two fish"]
 ```
 
+---
+
 ## roundToDecimal
 
 **roundToDecimal(num, decimalPlace)** :
@@ -171,7 +179,9 @@ result3 = roundToDecimal(num, 2) // 3.333
 
 ```
 
-### splitOut
+---
+
+## splitOut
 
 **splitOut(arr, filterArr, field, newField)** :
 Returns a new array of objects that splits out selected nested values into a new field.
@@ -196,7 +206,7 @@ const result1 = splitOut(data,["red fish","blue fish"],"column_1")
 const result2 = splitOut(data,["red fish","blue fish"],"column_1",column_2)
 ```
 
-**Results**
+**Results:** Here we split the values "red fish" and "blue fish" out to their own key/column.
 
 ```
 result1: [
@@ -278,7 +288,9 @@ let filteredArr = filterData(arr,filterArr)
 > [!NOTE]
 > There are many operations that you can filter by:
 
-### Filter Objects:
+---
+
+## Filter Objects:
 
 | Operation   | Usage                                       |
 | ----------- | ------------------------------------------- |
@@ -293,6 +305,8 @@ let filteredArr = filterData(arr,filterArr)
 | "includes"  | whether an array includes the value         |
 | "!includes" | whether an array does not include the value |
 | "or"        | [See below for usage ](#or-as-an-operation) |
+
+---
 
 ### Filtering by numeric values
 
@@ -323,6 +337,8 @@ let filteredArr = filterData(arr,[filterObj])
 ]
 ```
 
+---
+
 ### Filtering nested arrays
 
 You can filter by objects included or not included in arrays.
@@ -352,7 +368,9 @@ let filteredArr = filterData(arr,[filterObj])
 ]
 ```
 
-### Combining filters
+---
+
+## Combining filters
 
 Filters can be combined for complex filtering.
 
@@ -381,7 +399,9 @@ let filteredArr = filterData(arr,filterObj)
 ]
 ```
 
-### Or Filtering
+---
+
+## Or Filtering
 
 As the name implies, Or filtering functions with "or" logic. You can use any operator by adding the key isOr:true
 
@@ -416,6 +436,8 @@ let filteredArr = filterData(arr,filterObj)
 
 ```
 
+---
+
 ### Or as an Operation
 
 Or can be used as an operation for shallow equivalence of multiple fields. In this case the syntax is an array of fields, the operation "or" and the array of values to equal. The fields and values must be located at the same index within their respective arrays:
@@ -429,7 +451,10 @@ let orArr = [
                 {fieldOne:"otherValue",fieldTwo:"otherValue",fieldThree:"valueThree"},
                 {fieldOne:"otherValue",fieldTwo:"otherValue",fieldThree:"otherValue"}
             ]
+```
+
 **Function:** Here we add two arrays, so we return items where fieldOne = "valueOne" **OR** fieldTwo = "valueTwo" **OR** fieldThree = "valueThree"
+
 ```
 
 const orFilterOperation = {
@@ -453,6 +478,8 @@ let orDataFiltered = filterData(orArr,[orFilterOperation])
 ]
 
 ```
+
+---
 
 ## aggregateThings
 
@@ -513,7 +540,9 @@ let aggregatedData = aggregateThings(sourceData,["region"],aggObj)
 > [!NOTE]
 > Aggregation functions always include count. If all you need is the count, the aggObj array can be ommited. Ex: aggregateThings(arr,["field one","field two"])
 
-### Aggregation Operations
+---
+
+## Aggregation Operations
 
 Aggregation objects can include the following aggregation operations:
 |Operation|Usage|
@@ -597,7 +626,9 @@ let test1 = aggregateThings(dataArr, ["company"], [
 
 ```
 
-### Passing in Custom Functions
+---
+
+## Passing in Custom Functions
 
 You can pass your own functions into the aggregation object. When the aggregator runs, it will pass two arguments to your function:
 
@@ -667,7 +698,5 @@ let test1 = aggregateThings(dataArr, ["company"], [{ field: "topGenres", operati
 "count": 3
 }
 ]
-
-```
 
 ```
