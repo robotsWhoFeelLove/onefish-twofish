@@ -181,12 +181,15 @@ function aggregateThings(arr, groupArr, aggObj = [{ operation: "count" }], stric
 
   function addAggregates(data, aggObj, index) {
     let tempItem;
+
     if (aggObj.operation === "average") tempItem = averageThing(data, aggObj);
     if (aggObj.operation.slice(0, 1) === "%") {
       tempItem = percentOfThing(data, aggObj);
     }
     if (aggObj.operation === "count") tempItem = { count: data.length };
     if (aggObj.operation === "sum") tempItem = sumThing(data, aggObj);
+    if (aggObj.operation === "min") tempItem = minOfThing(data, aggObj);
+    if (aggObj.operation === "max") tempItem = maxOfThing(data, aggObj);
     groups[index] = {
       ...groups[index],
       [Object.keys(tempItem)[0]]: Object.values(tempItem)[0],
@@ -208,6 +211,18 @@ function averageThing(arr, aggObj) {
 function sumThing(arr, aggObj) {
   const sum = arr.reduce((total, item) => total + item[aggObj.field], 0);
   const val = { ["sum_of_" + aggObj.field]: sum };
+  return val;
+}
+
+function minOfThing(arr, aggObj) {
+  const min = Math.min(...arr.map((item) => item[aggObj.field]));
+  const val = { ["min_of_" + aggObj.field]: min };
+  return val;
+}
+
+function maxOfThing(arr, aggObj) {
+  const max = Math.max(...arr.map((item) => item[aggObj.field]));
+  const val = { ["max_of_" + aggObj.field]: max };
   return val;
 }
 
