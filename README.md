@@ -2,7 +2,17 @@
 
 Group of functions for common operations needed with arrays of objects for data manipulation, visualization prep, etc.
 
-## Functions:
+## Simple Functions:
+
+- [**splitOut**](#splitOut)
+- [**expandNested**](#expandNested)
+- [**getUniqueVals**](#getUniqueVals)
+- [**roundToDecimal**](#roundToDecimal)
+- [**cloneThing**](#cloneThing)
+
+## Complex Functions:
+
+//todo
 
 ---
 
@@ -13,10 +23,10 @@ Returns a new array of objects that splits out selected nested values into a new
 Does not modify the original Array field.
 Takes 4 isArguments:
 
-    2. filterArr | An Array of values to be filtered out.
-    1. arr       | The Original Array
-    3. field     | The name of the field within the object.
-    4. newField  | The name of the new field that those values will be split out to. If blank the field will be titled the name of the original field + "\_copy"
+- **filterArr:** An Array of values to be filtered out.
+- **arr:** The Original Array
+- **field:** The name of the field within the object.
+- **newField:** The name of the new field that those values will be split out to. If blank the field will be titled the name of the original field + \_copy
 
 **EX:**
 
@@ -48,9 +58,9 @@ const result1 = splitOut(data,["red fish","blue fish"],"column_1",column_2)
 Expands an array of objects by values within a nested Array.
 Takes 3 arguments
 
-    1. arr | The Original Array of objects.
-    2. field | The Name of the field containing the Array
-    3. newField | Optional- The name of the new field the values should be expanded to.
+- **arr:** The Original Array of objects.
+- **field:** The Name of the field containing the Array
+- **newField:** Optional- The name of the new field the values should be expanded to.
 
 If blank, values will overwrite the original field.
 **Ex:**
@@ -80,8 +90,8 @@ const result2 = expandNested (arr,"val3")
 Returns an array of all the unique values a field contains
 Takes 2 arguments:
 
-    1. arr | The array of objects
-    2. field | The field name as a string.
+- **arr:** The array of objects
+- **field:** The field name as a string.
 
 **Ex:**
 
@@ -119,7 +129,7 @@ result3 = roundToDecimal(num, 2) // 3.333
 Returns a deep clone of an object.
 Takes 1 arguments:
 
-    1. thing | The thing to clone
+- **thing:** The thing to clone
 
 **Ex:**
 
