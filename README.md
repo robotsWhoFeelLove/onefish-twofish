@@ -401,6 +401,7 @@ let filteredArr = filterData(arr,filterObj)
 
 ---
 
+<!--
 ## Or Filtering
 
 As the name implies, Or filtering functions with "or" logic. You can use any operator by adding the key isOr:true
@@ -477,7 +478,7 @@ let orDataFiltered = filterData(orArr,[orFilterOperation])
 {fieldOne:"otherValue",fieldTwo:"otherValue",fieldThree:"valueThree"},
 ]
 
-```
+``` -->
 
 ---
 
