@@ -1,3 +1,14 @@
+function getNumFields(arr) {
+  return Object.keys(arr[0]).filter((key) => {
+    console.log({ key });
+    let test = true;
+    arr.map((line) => {
+      if (isNaN(line[key])) test = false;
+    });
+    return test;
+  });
+}
+
 function splitOut(arr, filterArr, field, newField = field + "_copy") {
   let tempData = [];
   arr.map((datum) => {
@@ -12,6 +23,35 @@ function splitOut(arr, filterArr, field, newField = field + "_copy") {
     tempData = [...tempData, tempDatum];
   });
   return tempData;
+}
+
+function convertToArray(data, field, separator = ",") {
+  return data.map((row) => {
+    if (
+      separator === "|" ||
+      (row[field] &&
+        Array.from(row[field]).filter((el) => {
+          return el === "|";
+        }).length > 0)
+    ) {
+      separator = "|";
+    }
+    if (
+      separator === "\n" ||
+      Array.from(row[field]).filter((el) => {
+        return el === "\n";
+      }).length > 0
+    ) {
+      separator = "\n";
+    }
+    // console.log(row[field]);
+    if (row[field] === undefined) {
+      row[field] = [];
+    } else {
+      row[field] = row[field].split(separator);
+    }
+    return row;
+  });
 }
 
 function expandNested(arr, field, newField) {
@@ -59,68 +99,51 @@ function isNullObject(value) {
   return value === null && typeof value === "object";
 }
 
+function getOperationResult(a, b, operation) {
+  if (operation === "===") return a === b;
+  if (operation === "==") return a == b;
+  if (operation === "!==") return a !== b;
+  if (operation === "!=") return a != b;
+  if (operation === ">") return a > b;
+  if (operation === ">=") return a >= b;
+  if (operation === "<") return a < b;
+  if (operation === "<=") return a <= b;
+  if (operation === "includes") return a.includes(b);
+  if (operation === "!includes") return !a.includes(b);
+}
+
+// console.log(["red", "blue"].includes("green"));
+
 function filterData(dataArr, filterArr) {
-  let tempResult = [...dataArr];
-  let tempDatum;
+  let tempData = cloneThing(dataArr);
 
-  function runFilters(arr, filterObj) {
-    if (!filterObj) return;
-    let result = arr.filter((item) => {
-      if (filterObj.operation == ">=") return item[filterObj.field] >= filterObj.value;
-      if (filterObj.operation == "==") {
-        if (isEmpty(filterObj.value)) {
-          return isEmpty(item[filterObj.field]);
+  let fieldFilters = Object.keys(tempData[0])
+    .map((key) => {
+      let values = filterArr.filter((entry) => {
+        if (Array.isArray(entry.field)) {
+          return entry.field[0] == key;
         }
-        return item[filterObj.field] == filterObj.value;
-      }
-      if (filterObj.operation === "<=") return item[filterObj.field] <= filterObj.value;
-      if (filterObj.operation === "===") {
-        if (isEmpty(filterObj.value)) {
-          return isEmpty(item[filterObj.field]) && typeof filterObj.value === typeof item[filterObj.field];
-        }
-        return item[filterObj.field] === filterObj.value;
-      }
-      if (filterObj.operation == ">") return item[filterObj.field] > filterObj.value;
-      if (filterObj.operation == "<") return item[filterObj.field] < filterObj.value;
-      if (filterObj.operation == "includes") {
-        return item[filterObj.field].includes(filterObj.value);
-      }
-      if (filterObj.operation == "!includes") {
-        return !item[filterObj.field].includes(filterObj.value);
-      }
-      if (filterObj.operation == "!=") return item[filterObj.field] != filterObj.value;
-      if (filterObj.operation == "!==") return item[filterObj.field] !== filterObj.value;
+        return entry.field === key;
+      });
+
+      return { field: key, operation: values.map((el) => el.operation).flat(), values: values.map((el) => el.value).flat() };
+    })
+    .filter((el) => el.values.length > 0);
+
+  //   console.log({ fieldFilters });
+  fieldFilters.map((field) => {
+    tempData = tempData.filter((datum) => {
+      let test = false;
+
+      field.values.map((val, i) => {
+        if (getOperationResult(datum[field.field], val, field.operation[i])) test = true;
+      });
+      return test;
     });
-
-    return result;
-  }
-
-  filterArr.map((filter) => {
-    if (Array.isArray(filter.field) && filter.operation === "or" && Array.isArray(filter.value)) {
-      let filterSet = filter.field.map((el, index) => {
-        return {
-          field: el,
-          operation: "==",
-          value: filter.value[index],
-        };
-      });
-
-      tempDatum = tempResult.filter((item) => {
-        if (filterSet.length == 2) {
-          return item[filterSet[0].field] == filterSet[0].value || item[filterSet[1].field] == filterSet[1].value;
-        }
-      });
-    } else if (filter.isOr) {
-      tempDatum = runFilters(dataArr, filter);
-    } else {
-      tempDatum = runFilters(tempResult, filter);
-    }
-    if (filter.isOr) {
-      tempResult = tempResult.concat(tempDatum);
-    }
-    tempResult = [...tempDatum];
   });
-  return tempResult;
+
+  console.log({ tempData });
+  return tempData;
 }
 
 function groupThing(arr, groupArr, strict = false) {
@@ -181,15 +204,19 @@ function aggregateThings(arr, groupArr, aggObj = [{ operation: "count" }], stric
 
   function addAggregates(data, aggObj, index) {
     let tempItem;
-
-    if (aggObj.operation === "average") tempItem = averageThing(data, aggObj);
-    if (aggObj.operation.slice(0, 1) === "%") {
-      tempItem = percentOfThing(data, aggObj);
+    if (typeof aggObj.operation === "function") {
+      tempItem = aggObj.operation(data, aggObj);
+    } else {
+      if (aggObj.operation === "average") tempItem = averageThing(data, aggObj);
+      if (aggObj.operation.slice(0, 1) === "%") {
+        tempItem = percentOfThing(data, aggObj);
+      }
+      if (aggObj.operation === "count") tempItem = { count: data.length };
+      if (aggObj.operation === "sum") tempItem = sumThing(data, aggObj);
+      if (aggObj.operation === "min") tempItem = minOfThing(data, aggObj);
+      if (aggObj.operation === "max") tempItem = maxOfThing(data, aggObj);
     }
-    if (aggObj.operation === "count") tempItem = { count: data.length };
-    if (aggObj.operation === "sum") tempItem = sumThing(data, aggObj);
-    if (aggObj.operation === "min") tempItem = minOfThing(data, aggObj);
-    if (aggObj.operation === "max") tempItem = maxOfThing(data, aggObj);
+    if (tempItem === undefined || tempItem === null) return;
     groups[index] = {
       ...groups[index],
       [Object.keys(tempItem)[0]]: Object.values(tempItem)[0],
@@ -271,23 +298,36 @@ function roundToDecimal(num, decimalPlace) {
 }
 
 function getUniqueVals(array, field) {
-  return [...new Set(array.map((item) => item[field]))];
+  return [...new Set(array.map((item) => item[field]).flat())];
+}
+
+function checkForNumber(arr, field) {
+  let testForNum = false;
+  arr.map((val) => {
+    let testVal = val;
+    if (field) testVal = val[field];
+    if (typeof testVal === "number") testForNum = true;
+  });
+  return testForNum;
 }
 
 export {
+  checkForNumber,
   getUniqueVals,
   roundToDecimal,
   splitOut,
   expandNested,
-  filterData,
   flattenObject,
   groupThing,
   cloneThing,
   percentOfThing,
   sumThing,
   averageThing,
-  aggregateThing,
+  aggregateThings,
   isEmpty,
   isEmptyString,
   isNullObject,
+  convertToArray,
+  filterData,
+  getNumFields,
 };
