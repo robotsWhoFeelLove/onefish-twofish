@@ -1,6 +1,5 @@
 function getNumFields(arr) {
   return Object.keys(arr[0]).filter((key) => {
-    console.log({ key });
     let test = true;
     arr.map((line) => {
       if (isNaN(line[key])) test = false;
@@ -44,7 +43,6 @@ function convertToArray(data, field, separator = ",") {
     ) {
       separator = "\n";
     }
-    // console.log(row[field]);
     if (row[field] === undefined) {
       row[field] = [];
     } else {
@@ -112,8 +110,6 @@ function getOperationResult(a, b, operation) {
   if (operation === "!includes") return !a.includes(b);
 }
 
-// console.log(["red", "blue"].includes("green"));
-
 function filterData(dataArr, filterArr) {
   let tempData = cloneThing(dataArr);
 
@@ -130,7 +126,6 @@ function filterData(dataArr, filterArr) {
     })
     .filter((el) => el.values.length > 0);
 
-  //   console.log({ fieldFilters });
   fieldFilters.map((field) => {
     tempData = tempData.filter((datum) => {
       let test = false;
@@ -142,7 +137,6 @@ function filterData(dataArr, filterArr) {
     });
   });
 
-  console.log({ tempData });
   return tempData;
 }
 
